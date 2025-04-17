@@ -1,0 +1,5 @@
+Station,Platform,Market,ISCI Code,Creative Title,Length (sec),Flight Start,Flight End,Rotations,Notes
+WXYZ-TV Boston,TV,Boston,ABCD1234,Summer Sale :30,30,2024-06-01,2024-08-31,"M-F 6a-10a, Sa-Su 10a-5p",Priority placement
+KLMN-FM Chicago,Radio,Chicago,EFGH5678,Back to School :15,15,2024-08-15,2024-09-15,"M-F 7a-9a, 4p-7p",
+Streaming Platform X,Streaming,National,IJKL9012,Holiday Special :60,60,2024-11-15,2024-12-31,"24/7",
+WABC-TV New York,TV,New York,MNOP3456,New Product Launch :30,30,2024-07-01,2024-07-31,"M-F 8p-11p", 
