@@ -5,7 +5,7 @@ import FileDropZone from '@/components/FileDropZone'
 import MappingTable from '@/components/MappingTable'
 import ProgressBar from '@/components/ProgressBar'
 import { mergeSpecAndStationData } from '@/utils/mergeData'
-import { TrafficRow } from '@/types/traffic'
+import { TrafficRow, StationFlightDates } from '@/types/traffic'
 
 export default function Home() {
   const [specFile, setSpecFile] = useState<File | null>(null)
@@ -13,11 +13,13 @@ export default function Home() {
   const [normalizedSpecData, setNormalizedSpecData] = useState<any[]>([])
   const [normalizedStationData, setNormalizedStationData] = useState<any[]>([])
   const [mergedData, setMergedData] = useState<TrafficRow[]>([])
+  const [flightDates, setFlightDates] = useState<StationFlightDates[]>([])
   const [isProcessing, setIsProcessing] = useState(false)
   const [progress, setProgress] = useState(0)
   const [selectedStations, setSelectedStations] = useState<string[]>([])
   const [filterByPlatformType, setFilterByPlatformType] = useState(false)
   const [filterByDMA, setFilterByDMA] = useState(false)
+  const [agencyPhone, setAgencyPhone] = useState<string>('')
 
   const handleSpecFileUpload = async (files: File[]) => {
     if (files.length === 0) return
@@ -45,16 +47,18 @@ export default function Home() {
 
       // If we have both files, perform the merge
       if (stationFile) {
-        const mergedRows = mergeSpecAndStationData(
+        const { mergedRows, flightDates: newFlightDates } = mergeSpecAndStationData(
           data.normalizedData,
           normalizedStationData,
           {
             filterByPlatformType,
             filterByDMA,
             selectedStations: selectedStations.length > 0 ? selectedStations : undefined,
+            agencyPhone,
           }
         )
         setMergedData(mergedRows)
+        setFlightDates(newFlightDates)
         setProgress(100)
       }
     } catch (error) {
@@ -90,16 +94,18 @@ export default function Home() {
 
       // If we have both files, perform the merge
       if (specFile) {
-        const mergedRows = mergeSpecAndStationData(
+        const { mergedRows, flightDates: newFlightDates } = mergeSpecAndStationData(
           normalizedSpecData,
           data.normalizedData,
           {
             filterByPlatformType,
             filterByDMA,
             selectedStations: selectedStations.length > 0 ? selectedStations : undefined,
+            agencyPhone,
           }
         )
         setMergedData(mergedRows)
+        setFlightDates(newFlightDates)
         setProgress(100)
       }
     } catch (error) {
@@ -121,7 +127,11 @@ export default function Home() {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ data: mergedData }),
+        body: JSON.stringify({ 
+          data: mergedData,
+          flightDates,
+          agencyPhone,
+        }),
       })
 
       if (!response.ok) {
@@ -154,6 +164,22 @@ export default function Home() {
       {isProcessing && <ProgressBar percentage={progress} />}
 
       <div className="mb-8">
+        <h2 className="text-xl font-semibold mb-4">Agency Information</h2>
+        <div className="flex gap-4">
+          <label className="flex items-center gap-2">
+            <span className="w-32">Agency Phone:</span>
+            <input
+              type="text"
+              value={agencyPhone}
+              onChange={(e) => setAgencyPhone(e.target.value)}
+              placeholder="e.g., 336-721-1021"
+              className="px-3 py-1 border rounded"
+            />
+          </label>
+        </div>
+      </div>
+
+      <div className="mb-8">
         <h2 className="text-xl font-semibold mb-4">Filters</h2>
         <div className="flex gap-4">
           <label className="flex items-center gap-2">
@@ -179,6 +205,38 @@ export default function Home() {
         <div className="mb-8">
           <h2 className="text-xl font-semibold mb-4">Merged Data Preview</h2>
           <MappingTable rows={mergedData} />
+        </div>
+      )}
+
+      {flightDates.length > 0 && (
+        <div className="mb-8">
+          <h2 className="text-xl font-semibold mb-4">Flight Dates Summary</h2>
+          <div className="overflow-x-auto">
+            <table className="min-w-full divide-y divide-gray-200">
+              <thead className="bg-gray-50">
+                <tr>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Station
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Overall Flight Dates
+                  </th>
+                </tr>
+              </thead>
+              <tbody className="bg-white divide-y divide-gray-200">
+                {flightDates.map(({ station, overallStartDate, overallEndDate }) => (
+                  <tr key={station}>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      {station}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      {overallStartDate} – {overallEndDate}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         </div>
       )}
 
