@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { useTable } from 'react-table'
+import { useTable, Column } from 'react-table'
 import { TrafficRowSchema } from '@/lib/schemas/trafficRow'
 
 interface MappingTableProps {
@@ -9,11 +9,16 @@ interface MappingTableProps {
   onMappingComplete: (data: any) => void
 }
 
+interface TableData {
+  source: string
+  target: string
+}
+
 const CANONICAL_COLUMNS = Object.keys(TrafficRowSchema.shape)
 
 export default function MappingTable({ files, onMappingComplete }: MappingTableProps) {
   const [mappings, setMappings] = useState<Record<string, string>>({})
-  const [sampleData, setSampleData] = useState<any[]>([])
+  const [sampleData, setSampleData] = useState<TableData[]>([])
 
   // TODO: Implement file parsing and AI mapping
   const handleFileParse = async (file: File) => {
@@ -28,7 +33,7 @@ export default function MappingTable({ files, onMappingComplete }: MappingTableP
     }))
   }
 
-  const columns = [
+  const columns: Column<TableData>[] = [
     {
       Header: 'Source Column',
       accessor: 'source',
@@ -36,7 +41,7 @@ export default function MappingTable({ files, onMappingComplete }: MappingTableP
     {
       Header: 'Mapped To',
       accessor: 'target',
-      Cell: ({ row }: any) => (
+      Cell: ({ row }) => (
         <select
           value={mappings[row.original.source] || ''}
           onChange={(e) => handleMappingChange(row.original.source, e.target.value)}
@@ -59,7 +64,7 @@ export default function MappingTable({ files, onMappingComplete }: MappingTableP
     headerGroups,
     rows,
     prepareRow,
-  } = useTable({
+  } = useTable<TableData>({
     columns,
     data: sampleData,
   })
