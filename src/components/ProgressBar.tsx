@@ -1,13 +1,13 @@
 interface ProgressBarProps {
-  percentage: number
+  progress: number
 }
 
-export default function ProgressBar({ percentage }: ProgressBarProps) {
+export default function ProgressBar({ progress }: ProgressBarProps) {
   return (
     <div className="w-full bg-gray-200 rounded-full h-2.5">
       <div
         className="bg-blue-600 h-2.5 rounded-full"
-        style={{ width: `${percentage}%` }}
+        style={{ width: `${progress}%` }}
       />
     </div>
   )

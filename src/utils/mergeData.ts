@@ -1,4 +1,4 @@
-import { TrafficRow, StationMeta, StationFlightDates } from '@/types/traffic'
+import { TrafficRow, StationMeta, StationFlightDates } from '../types/traffic'
 
 interface NormalizedSpec {
   client: string

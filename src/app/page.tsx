@@ -4,8 +4,8 @@ import { useState } from 'react'
 import FileDropZone from '@/components/FileDropZone'
 import MappingTable from '@/components/MappingTable'
 import ProgressBar from '@/components/ProgressBar'
-import { mergeSpecAndStationData } from '@/utils/mergeData'
-import { TrafficRow, StationFlightDates } from '@/types/traffic'
+import { mergeSpecAndStationData } from '../utils/mergeData'
+import { TrafficRow, StationFlightDates } from '../types/traffic'
 
 export default function Home() {
   const [specFile, setSpecFile] = useState<File | null>(null)
@@ -161,7 +161,7 @@ export default function Home() {
         </div>
       </div>
 
-      {isProcessing && <ProgressBar percentage={progress} />}
+      {isProcessing && <ProgressBar progress={progress} />}
 
       <div className="mb-8">
         <h2 className="text-xl font-semibold mb-4">Agency Information</h2>
@@ -204,7 +204,7 @@ export default function Home() {
       {mergedData.length > 0 && (
         <div className="mb-8">
           <h2 className="text-xl font-semibold mb-4">Merged Data Preview</h2>
-          <MappingTable rows={mergedData} />
+          <MappingTable data={mergedData} />
         </div>
       )}
 

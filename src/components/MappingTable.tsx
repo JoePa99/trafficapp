@@ -1,4 +1,4 @@
-import { TrafficRow } from '@/types/traffic'
+import { TrafficRow } from '../types/traffic'
 import {
   useTable,
   useSortBy,
@@ -8,10 +8,10 @@ import {
 } from 'react-table'
 
 interface MappingTableProps {
-  rows: TrafficRow[]
+  data: TrafficRow[]
 }
 
-export default function MappingTable({ rows }: MappingTableProps) {
+export default function MappingTable({ data }: MappingTableProps) {
   const columns: Column<TrafficRow>[] = [
     { Header: 'Client', accessor: 'client' },
     { Header: 'Product', accessor: 'product' },
@@ -48,7 +48,7 @@ export default function MappingTable({ rows }: MappingTableProps) {
   } = useTable(
     {
       columns,
-      data: rows,
+      data,
       initialState: { pageIndex: 0, pageSize: 10 },
     },
     useSortBy,
