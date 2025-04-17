@@ -2,14 +2,15 @@ import '@testing-library/jest-dom'
 import { beforeAll, afterAll, afterEach } from 'vitest'
 import { cleanup } from '@testing-library/react'
 import { setupServer } from 'msw/node'
-import { rest } from 'msw'
+import { http, HttpResponse } from 'msw'
+import { vi } from 'vitest'
 
 // Mock Supabase client
 vi.mock('@supabase/supabase-js', () => ({
   createClient: () => ({
     from: () => ({
+      insert: () => Promise.resolve({ data: null, error: null }),
       select: () => Promise.resolve({ data: [], error: null }),
-      insert: () => Promise.resolve({ data: [], error: null }),
     }),
     storage: {
       from: () => ({
@@ -26,7 +27,23 @@ vi.mock('openai', () => ({
     chat = {
       completions: {
         create: () => Promise.resolve({
-          choices: [{ message: { content: JSON.stringify({ mappings: {} }) } }],
+          choices: [{
+            message: {
+              content: JSON.stringify({
+                normalizedData: {
+                  client: 'Test Client',
+                  product: 'Test Product',
+                  startDate: '2024-01-01',
+                  endDate: '2024-01-31',
+                  mediaType: 'Digital',
+                  budget: 10000,
+                  targetAudience: 'Adults 18-49',
+                  campaignGoals: 'Brand Awareness',
+                  specialInstructions: 'None',
+                },
+              }),
+            },
+          }],
         }),
       },
     }
@@ -35,11 +52,11 @@ vi.mock('openai', () => ({
 
 // Setup MSW
 const handlers = [
-  rest.post('/api/upload', (req, res, ctx) => {
-    return res(ctx.json({ success: true, rowCount: 1 }))
+  http.post('/api/upload', () => {
+    return HttpResponse.json({ success: true, rowCount: 1 })
   }),
-  rest.post('/api/generate', (req, res, ctx) => {
-    return res(ctx.json({ success: true, pdfUrls: ['https://example.com/test.pdf'] }))
+  http.post('/api/generate', () => {
+    return HttpResponse.json({ success: true, pdfUrls: ['https://example.com/test.pdf'] })
   }),
 ]
 
